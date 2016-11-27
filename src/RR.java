@@ -10,7 +10,7 @@ public class RR {
     final static int PID = 0;
     final static int BT = 1;
     final static int PRIORITY = 2;
-    final int QUOTA = 2;
+    final int QUOTA = 10;
 
     InputArray input;
     RRWaitQ rrWaitQ;
@@ -31,7 +31,7 @@ public class RR {
     public void main(){
         this.input.displayArray();
 
-        int start = 0; int end = start + 2;
+        int start = 0; int end = start + QUOTA;
         do{
             if(checkArrival(start, end)){
                 enqueueWait();
@@ -43,10 +43,10 @@ public class RR {
                 if(!isBurstEmpty(pid)){
                     enqueueWait(pid);
                 }
-
             }
-            start += 2; end += 2;
-        }while(this.rrWaitQ.isEmpty() != true);
+            start += QUOTA; end += QUOTA;
+        }while((this.rrWaitQ.isEmpty() != true) ||
+                (end < inputArr.length));
         displayGantt();
     }
 

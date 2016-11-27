@@ -8,6 +8,10 @@ public class InputArray {
     final static int PID = 0;
     final static int BT = 1;
     final static int PRIORITY = 2;
+    final static int OPTPID = 0;
+    final static int OPTPRIORITY = 1;
+    final static int OPTBT = 2;
+    final static int OPTAT = 3;
 
     static int[][] array;
 
@@ -27,7 +31,12 @@ public class InputArray {
         }
         System.out.println();
         System.out.println("Array is:");
-        System.out.print(Arrays.toString(pidArr)+"\n");
+
+        for(int i=0; i<pidArr.length; i++){
+            if(pidArr[i] != -1){
+                System.out.print("Index: "+i+" "+pidArr[i]+"\t");
+            }
+        }
         System.out.println();
 
         int[][] timeArr = new int[array.length][array[0].length-1];
@@ -36,7 +45,8 @@ public class InputArray {
             timeArr[i][1] = array[i][PRIORITY];
         }
         for(int i=0; i<timeArr.length; i++){
-            System.out.println(Arrays.toString(timeArr[i]));
+            if(timeArr[i][0] != -1)
+                System.out.println(Arrays.toString(timeArr[i]));
         }
     }
 
@@ -47,13 +57,29 @@ public class InputArray {
                 this.array[i][j] = -1;
             }
         }
-        int[][] array= {
-                {1,2,2},
-                {2,1,1},
-                {3,8,4},
-                {4,4,2},
-                {5,5,3}
-        };
+
+
+        int[][] optimize= {
+                {1,40,20,0},
+                {2,30,25,25},
+                {3,30,25,30},
+                {4,35,15,60},
+                {5,5,10,100},
+                {6,10,10,105}
+        };//input get
+
+        int[][] array = new int[200][3];
+        for(int i=0; i<array.length; i++){
+            array[i][BT] = -1;
+            array[i][PID] = -1;
+        }
+        for(int i=0; i<optimize.length; i++){
+            array[optimize[i][OPTAT]][PID] = optimize[i][PID];
+            array[optimize[i][OPTAT]][BT] = optimize[i][BT];
+            array[optimize[i][OPTAT]][PRIORITY] = optimize[i][PRIORITY];
+
+        }
+
         this.array = array;
     }
 }
