@@ -14,8 +14,10 @@ public class InputArray {
     final static int OPTAT = 3;
 
     static int[][] array;
+    static int[][] optimize;
 
-    public InputArray(){
+    public InputArray(int[][] array){
+        this.optimize = array;
         readFile();
     }
 
@@ -59,14 +61,16 @@ public class InputArray {
         }
 
 
-        int[][] optimize= {
-                {1,40,20,0},
-                {2,30,25,25},
-                {3,30,25,30},
-                {4,35,15,60},
-                {5,5,10,100},
-                {6,10,10,105}
-        };//input get
+//        int[][] optimize= {
+//                {1,40,20,0},
+//                {2,30,25,25},
+//                {3,30,25,30},
+//                {4,35,15,60},
+//                {5,5,10,100},
+//                {6,10,10,105}
+//        };//input get
+        int[][] optimize = this.optimize;
+
 
         int[][] array = new int[200][3];
         for(int i=0; i<array.length; i++){
