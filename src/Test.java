@@ -14,10 +14,17 @@ public class Test {
 
         ReadFile file = new ReadFile();
         InputArray ia = new InputArray(file.getArray());
-
+        Heapsort hp = new Heapsort();
         RRWaitQ rrq = new RRWaitQ();
         RRGantt rrGantt = new RRGantt();
-        RR rr = new RR(rrq, rrGantt, ia);
-        //
+        RR rr = new RR(rrq, rrGantt, ia, hp);
+
+        System.out.println("\nPress enter to exit");
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
     }
 }

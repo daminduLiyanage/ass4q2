@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
 import java.util.LinkedList;
 
 /**
@@ -11,42 +8,50 @@ public class RR {
     final static int BT = 1;
     final static int PRIORITY = 2;
     final int QUOTA = 10;
+    final int WAIT_TIME = 1;
+    int[][] waitArr;
 
     InputArray input;
     RRWaitQ rrWaitQ;
     RRGantt rrGantt;
     int[][] inputArr;
-    //ArrayList<Integer> newArrivalsList;
     LinkedList<Integer> newArrivalsList;
 
-    public RR(RRWaitQ rrq, RRGantt rrGantt, InputArray input){
+    public RR(RRWaitQ rrq, RRGantt rrGantt, InputArray input, Heapsort hp){
         this.rrWaitQ = rrq;
         this.rrGantt = rrGantt;
         this.input = input;
         this.inputArr = input.getArray();
-        //this.newArrivalsList = new ArrayList<Integer>(0);
+        this.waitArr = new int[inputArr.length][2];
+
+        //run
+        resetArray(this.waitArr);
+        this.alterPriority();
+        //hp.runSort(inputArr, PRIORITY);
         this.main();
+        this.printWaitTime();
+        this.printTAT();
+
     }
 
     public void main(){
-        this.input.displayArray();
-
         int start = 0; int end = start + QUOTA;
         do{
             if(checkArrival(start, end)){
                 enqueueWait();
-            } //the list gets updated only on true
+            }
             if(!this.rrWaitQ.isEmpty()) {
                 int pid = dequeueWait();
                 deductBurst(pid);
+                waitTime(pid);
                 enqueueGantt(pid);
                 if(!isBurstEmpty(pid)){
                     enqueueWait(pid);
                 }
             }
             start += QUOTA; end += QUOTA;
-        }while((this.rrWaitQ.isEmpty() != true) ||
-                (end < inputArr.length));
+        }while((this.rrWaitQ.isEmpty() != true)
+                || (end < inputArr.length));
         displayGantt();
     }
 
@@ -74,7 +79,6 @@ public class RR {
      * Checks t-2 to t arrivals. But does not include t-2 slot arrivals. Include t.
      */
     public boolean checkArrival(int startTime, int endTime){
-        //this.newArrivalsList.clear();
         if(endTime > this.inputArr.length){
             endTime = this.inputArr.length;
         }
@@ -83,19 +87,18 @@ public class RR {
                 ){
             return false;
         }
-        //ArrayList<Integer> newArrivalsList = new ArrayList<Integer>();
         LinkedList<Integer> newArrivalList = new LinkedList<>();
         for(int i = startTime; i<endTime; i++){
             if(this.inputArr[i][PID] != -1 ||
                     this.inputArr[i][BT] > 0) {
-                //newArrivalsList.add(this.inputArr[i][PID]);
                 newArrivalList.push(this.inputArr[i][PID]);
             }
         }
-        //this.newArrivalsList = newArrivalsList;
         this.newArrivalsList = newArrivalList;
         return true;
     }
+
+
 
     /**
      * Step 2 RoundRobin
@@ -126,5 +129,57 @@ public class RR {
 
     private void displayGantt() {
         this.rrGantt.display();
+    }
+
+    private int searchByPID(int pid){
+        for(int i=0; i<this.inputArr.length; i++){
+            if(this.inputArr[i][PID] == pid){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void waitTime(int pid){
+        int index = searchByPID(pid);
+        waitArr[index][PID] = pid;
+        for(int i=0; i<this.waitArr.length; i++){
+            if(i != index && this.inputArr[i][BT] > 0)
+                waitArr[i][WAIT_TIME] += 2;
+        }
+    }
+
+    private void resetArray(int[][] array){
+        for(int i=0; i<array.length; i++)
+            for(int j=0; j<array[i].length; j++)
+                array[i][j] = 0;
+    }
+
+    private void printWaitTime(){
+        System.out.println("Waiting time:");
+        for(int i=0; i<this.waitArr.length; i++){
+            if(this.waitArr[i][PID] != 0)
+                System.out.println("P" + this.waitArr[i][PID] + ": " + this.waitArr[i][1]);
+        }
+    }
+
+    private void printTAT(){
+        System.out.println("Turn around time:");
+        for(int i=0; i<this.waitArr.length; i++)
+            if(this.waitArr[i][PID] != 0)
+                System.out.println("P" + this.waitArr[i][PID] + ": "
+                        + (this.waitArr[i][WAIT_TIME] + remainingTime(i) - 0));
+
+    }
+
+    private int remainingTime(int index){
+        if(this.inputArr[index][BT] == -1)
+            return 1;
+        else return 2;
+    }
+
+    private void alterPriority() {
+        for(int i=0; i<this.inputArr.length; i++)
+            this.inputArr[i][PRIORITY] = 100 - this.inputArr[i][PRIORITY];
     }
 }
